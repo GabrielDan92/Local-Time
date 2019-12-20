@@ -1,0 +1,113 @@
+<DOCTYPE html>
+    <html lang="en">
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+        <style>
+            body{
+                margin-top: 70px;
+                background:#333;
+                color:#fff;
+            }
+            #name{
+                text-align: center;
+            }
+        </style>
+        <title>Current Local Time</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <h1 class="display-4 text-center mb-3">Automation Team's Local Time</h1>
+                    <form>
+                        <div class="form-group">
+                            <input 
+                            id="name"
+                            type="string" 
+                            class="form-control form-control-lg" 
+                            placeholder="Enter your name here">
+                        </div>
+                    </form>
+
+                    <div id="output">
+                        <div class="card bg-success mb-2">
+                            <div class="card-block">
+                                <h4 id="location1"></h4>
+                                <div id="city1Output"></div>
+                            </div>
+                        </div>
+    
+                        <div class="card bg-primary mb-2">
+                                <div class="card-block">
+                                    <h4 id="location2"></h4>
+                                    <div id="city2Output"></div>
+                                </div>
+                            </div>
+    
+                        <div class="card bg-warning mb-2">
+                                <div class="card-block">
+                                    <h4 id="location3"></h4>
+                                    <div id="city3Output"></div>
+                                </div>
+                            </div>
+
+                        <div class="card bg-info mb-2">
+                            <div class="card-block">
+                                <h4 id="location4"></h4>
+                                <div id="city4Output"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="notvalid">
+                            <div class="card bg-danger">
+                                    <div class="card-block">
+                                        <h4 align="center">Please enter your name and press Enter</h4>
+                                    </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <script>
+            document.getElementById("output").style.visibility = "hidden";
+            document.getElementById("name").addEventListener("keydown", function(e){
+                document.getElementById("output").style.visibility = "visible";
+                let name = e.target.value;
+                
+                hour();
+                function hour(){
+                    date = new Date();
+                    hour = date.getHours();
+                    min = date.getMinutes();
+                    am_pm = hour >= 12 ? 'pm' : 'am';
+                    hour = hour % 12;
+                    hour = hour ? hour : 12;
+                    min = min < 10 ? '0'+min : min;
+                }
+    
+                if (e.key === "Enter") {
+                    event.preventDefault();
+                    document.getElementById("notvalid").style.visibility = "hidden";
+                    document.getElementById("location1").innerHTML = "Bucharest, Romania";
+                    document.getElementById("city1Output").innerHTML = "Hi " + name + "! The local time in Romania is: " +moment().format('hh:mm a');
+    
+                    document.getElementById("location2").innerHTML = "Clermont-Ferrand, France";
+                    document.getElementById("city2Output").innerHTML = "The local time in Clermont-Ferrand, France is: " + moment().subtract(1, 'hour').format('hh:mm a');
+    
+                    document.getElementById("location3").innerHTML = "Greenville, South Carolina";
+                    document.getElementById("city3Output").innerHTML = "The local time in Greenville, South Carolina is: " + moment().subtract(7, 'hour').format('hh:mm a');
+
+                    document.getElementById("location4").innerHTML = "Pune, India";
+                    document.getElementById("city4Output").innerHTML = "The local time in Pune, India is: " + moment().add(3.5, 'hour').format('hh:mm a');
+                } else {
+                    document.getElementById("output").style.visibility = "hidden";
+                    document.getElementById("notvalid").style.visibility = "visible";
+                }
+
+            });
+        </script>
+    </body>
+    </html>
