@@ -26,91 +26,131 @@
                     <form>
                         <div class="form-group">
                             <input 
-                            id="name"
-                            type="string" 
-                            class="form-control form-control-lg" 
-                            placeholder="Enter your name here">
+                            id="name" type="string" class="form-control form-control-lg" placeholder="Enter your name here">
                         </div>
                     </form>
-
-                    <div id="output">
+                    <div id="output" class="text-center">
                         <div class="card bg-success mb-2">
                             <div class="card-block">
-                                <h4 id="location1"></h4>
-                                <div id="city1Output"></div>
+                                <h4 id="location1" >Bucharest, Romania</h4>
+                                <div id="Bucharest"></div>
                             </div>
                         </div>
-    
                         <div class="card bg-primary mb-2">
-                                <div class="card-block">
-                                    <h4 id="location2"></h4>
-                                    <div id="city2Output"></div>
-                                </div>
+                            <div class="card-block">
+                                <h4 id="location2">Clermont-Ferrand, France</h4>
+                                <div id="Clermont"></div>
                             </div>
-    
+                        </div>
                         <div class="card bg-warning mb-2">
-                                <div class="card-block">
-                                    <h4 id="location3"></h4>
-                                    <div id="city3Output"></div>
-                                </div>
+                            <div class="card-block">
+                                <h4 id="location3">Greenville, South Carolina</h4>
+                                <div id="Greenville"></div>
                             </div>
-
+                        </div>
                         <div class="card bg-info mb-2">
                             <div class="card-block">
-                                <h4 id="location4"></h4>
-                                <div id="city4Output"></div>
+                                <h4 id="location4">Pune, India</h4>
+                                <div id="Pune"></div>
                             </div>
                         </div>
                     </div>
-
-                    <div id="notvalid">
-                            <div class="card bg-danger">
-                                    <div class="card-block">
-                                        <h4 align="center">Please enter your name and press Enter</h4>
-                                    </div>
+                    <div id="notvalid" class="text-center">
+                        <div class="card bg-danger">
+                            <div class="card-block">
+                                <h4 align="center">Please enter a valid name and press Enter</h4>
                             </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="text-center">
+                        <h6><span><b>Disclaimer:</b> The local time is being retrieved using World Time API's free service. Excerpt from the website: <i>The API can go down from time-to-time, for relatively long periods. It is provided with no SLA, no guarantees, and no direct funding.</i></span></h6>
                     </div>
                 </div>
+
             </div>
         </div>
+
     
         <script>
             document.getElementById("output").style.visibility = "hidden";
+            var zones = ["Europe/Bucharest", "Europe/Paris", "America/New_York", "Asia/Colombo"];
+            var cities = ["Bucharest", "Clermont", "Greenville", "Pune"];
+            var hours = {Bucharest: 0, Clermont: 0, Greenville: 0, Pune: 0};
+            var link;
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            function hour(){
+                date = new Date();
+                hour = date.getHours();
+                min = date.getMinutes();
+                am_pm = hour >= 12 ? 'pm' : 'am';
+                hour = hour % 12;
+                hour = hour ? hour : 12;
+                min = min < 10 ? '0'+min : min;
+            }
+            hour();
+
+            async function getHour(delay, name) {
+                // retrieve the local time for each zone's array using worldtimeapi
+                for (i = 0; i < zones.length; i++) {
+                    var request = new XMLHttpRequest();
+                    link = "http://worldtimeapi.org/api/timezone/" + zones[i];
+                    request.open("GET", link, true);
+                    request.onload = function () {
+                        var data = JSON.parse(this.response);
+
+                        if (request.status >= 200 && request.status < 400) {
+                            // parse through the JSON response and keep only the local time
+                            time = data.datetime.split("T");
+                            time = time[1].split(".");
+                            time = time[0].split(":");
+                            time = time[0] + ":" + time[1];
+                            // access each hours object element and add the corresponding hoyr using cities' array values
+                            hours[cities[i]] = time;
+                        } else {
+                            // if there is a problem with the api request, calculate the local time using moments.js
+                            switch (cities[i]) {
+                                case "Bucharest":
+                                    hours[cities[i]] = moment().format('hh:mm a');
+                                    break;
+                                case "Clermont":
+                                    hours[cities[i]] = moment().subtract(1, 'hour').format('hh:mm a');
+                                    break;
+                                case "Greenville":
+                                    hours[cities[i]] = moment().subtract(7, 'hour').format('hh:mm a');
+                                    break;
+                                case "Pune":
+                                    hours[cities[i]] = moment().add(3.5, 'hour').format('hh:mm a');
+                            }
+                        }
+                    }
+                    request.send();
+                    await new Promise(r => setTimeout(r, delay));
+                    if (i == 0){
+                        message = "Hi " + name + "! The local time in " + cities[i] + " is: " + hours[cities[i]];
+                    } else {
+                        message = "The local time in " + cities[i] + " is: " + hours[cities[i]];
+                    }
+                    document.getElementById(cities[i]).innerHTML = message;
+                }
+            }
+
             document.getElementById("name").addEventListener("keydown", function(e){
                 document.getElementById("output").style.visibility = "visible";
                 let name = e.target.value;
-                
-                hour();
-                function hour(){
-                    date = new Date();
-                    hour = date.getHours();
-                    min = date.getMinutes();
-                    am_pm = hour >= 12 ? 'pm' : 'am';
-                    hour = hour % 12;
-                    hour = hour ? hour : 12;
-                    min = min < 10 ? '0'+min : min;
-                }
-    
-                if (e.key === "Enter") {
+                if (e.key === "Enter" && name !== "") {
+                    // call the worldtimeapi and make the html elements visible once the JSON response has been retrieved
                     event.preventDefault();
                     document.getElementById("notvalid").style.visibility = "hidden";
-                    document.getElementById("location1").innerHTML = "Bucharest, Romania";
-                    document.getElementById("city1Output").innerHTML = "Hi " + name + "! The local time in Romania is: " +moment().format('hh:mm a');
-    
-                    document.getElementById("location2").innerHTML = "Clermont-Ferrand, France";
-                    document.getElementById("city2Output").innerHTML = "The local time in Clermont-Ferrand, France is: " + moment().subtract(1, 'hour').format('hh:mm a');
-    
-                    document.getElementById("location3").innerHTML = "Greenville, South Carolina";
-                    document.getElementById("city3Output").innerHTML = "The local time in Greenville, South Carolina is: " + moment().subtract(7, 'hour').format('hh:mm a');
-
-                    document.getElementById("location4").innerHTML = "Pune, India";
-                    document.getElementById("city4Output").innerHTML = "The local time in Pune, India is: " + moment().add(3.5, 'hour').format('hh:mm a');
+                    getHour(200, name);
                 } else {
                     document.getElementById("output").style.visibility = "hidden";
                     document.getElementById("notvalid").style.visibility = "visible";
                 }
-
             });
+
         </script>
     </body>
-    </html>
+</html>
