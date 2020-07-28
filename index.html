@@ -135,6 +135,29 @@
                     }
                     document.getElementById(cities[i]).innerHTML = message;
                 }
+                    for (i = 0; i < cities.length; i++) {
+                        switch (cities[i]) {
+                            case "Bucharest":
+                                if (hours[cities[i]] == 0) {
+                                    hours[cities[i]] = moment().format('hh:mm a');
+                                }
+                                break;
+                            case "Clermont":
+                                if (hours[cities[i]] == 0) {
+                                    hours[cities[i]] = moment().subtract(1, 'hour').format('hh:mm a');
+                                }
+                                break;
+                            case "Greenville":
+                                if (hours[cities[i]] == 0) {
+                                    hours[cities[i]] = moment().subtract(7, 'hour').format('hh:mm a');
+                                }
+                                break;
+                            case "Pune":
+                                if (hours[cities[i]] == 0) {
+                                    hours[cities[i]] = moment().add(3.5, 'hour').format('hh:mm a');
+                                }
+                        }
+                    }
             }
 
             document.getElementById("name").addEventListener("keydown", function(e){
