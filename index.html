@@ -96,7 +96,7 @@
                 // retrieve the local time for each zone's array using worldtimeapi
                 for (i = 0; i < zones.length; i++) {
                     var request = new XMLHttpRequest();
-                    link = "http://worldtimeapi.org/api/timezone/" + zones[i];
+                    link = "https://worldtimeapi.org/api/timezone/" + zones[i];
                     request.open("GET", link, true);
                     request.onload = function () {
                         var data = JSON.parse(this.response);
