@@ -71,7 +71,6 @@
             </div>
         </div>
 
-    
         <script>
             document.getElementById("output").style.visibility = "hidden";
             var zones = ["Europe/Bucharest", "Europe/Paris", "America/New_York", "Asia/Colombo"];
@@ -81,16 +80,6 @@
             function sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
             }
-            function hour(){
-                date = new Date();
-                hour = date.getHours();
-                min = date.getMinutes();
-                am_pm = hour >= 12 ? 'pm' : 'am';
-                hour = hour % 12;
-                hour = hour ? hour : 12;
-                min = min < 10 ? '0'+min : min;
-            }
-            hour();
 
             async function getHour(delay, name) {
                 // retrieve the local time for each zone's array using worldtimeapi
@@ -98,9 +87,9 @@
                     var request = new XMLHttpRequest();
                     link = "https://worldtimeapi.org/api/timezone/" + zones[i];
                     request.open("GET", link, true);
+                    
                     request.onload = function () {
                         var data = JSON.parse(this.response);
-
                         if (request.status >= 200 && request.status < 400) {
                             // parse through the JSON response and keep only the local time
                             time = data.datetime.split("T");
@@ -109,25 +98,13 @@
                             time = time[0] + ":" + time[1];
                             // access each hours object element and add the corresponding hoyr using cities' array values
                             hours[cities[i]] = time;
-                        } else {
-                            // if there is a problem with the api request, calculate the local time using moments.js
-                            switch (cities[i]) {
-                                case "Bucharest":
-                                    hours[cities[i]] = moment().format('hh:mm a');
-                                    break;
-                                case "Clermont":
-                                    hours[cities[i]] = moment().subtract(1, 'hour').format('hh:mm a');
-                                    break;
-                                case "Greenville":
-                                    hours[cities[i]] = moment().subtract(7, 'hour').format('hh:mm a');
-                                    break;
-                                case "Pune":
-                                    hours[cities[i]] = moment().add(3.5, 'hour').format('hh:mm a');
-                            }
                         }
                     }
                     request.send();
                     await new Promise(r => setTimeout(r, delay));
+                    if (hours[cities[i]] == 0) {
+                        hours[cities[i]] = "Time is the indefinite continued progress of existence and events that occur in an apparently irreversible succession from the past, through the present, into the future. But I have no idea what time is it in this city.";
+                    }
                     if (i == 0){
                         message = "Hi " + name + "! The local time in " + cities[i] + " is: " + hours[cities[i]];
                     } else {
@@ -135,29 +112,6 @@
                     }
                     document.getElementById(cities[i]).innerHTML = message;
                 }
-                    for (i = 0; i < cities.length; i++) {
-                        switch (cities[i]) {
-                            case "Bucharest":
-                                if (hours[cities[i]] == 0) {
-                                    hours[cities[i]] = moment().format('hh:mm a');
-                                }
-                                break;
-                            case "Clermont":
-                                if (hours[cities[i]] == 0) {
-                                    hours[cities[i]] = moment().subtract(1, 'hour').format('hh:mm a');
-                                }
-                                break;
-                            case "Greenville":
-                                if (hours[cities[i]] == 0) {
-                                    hours[cities[i]] = moment().subtract(7, 'hour').format('hh:mm a');
-                                }
-                                break;
-                            case "Pune":
-                                if (hours[cities[i]] == 0) {
-                                    hours[cities[i]] = moment().add(3.5, 'hour').format('hh:mm a');
-                                }
-                        }
-                    }
             }
 
             document.getElementById("name").addEventListener("keydown", function(e){
